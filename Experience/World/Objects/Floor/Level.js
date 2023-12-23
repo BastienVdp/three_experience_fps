@@ -5,7 +5,7 @@ import Component from "../../Component";
 
 export default class Level extends Component 
 {
-	constructor({ container, debug, mesh })
+	constructor({ container, debug })
 	{
 		super();
 
@@ -14,7 +14,7 @@ export default class Level extends Component
 
 		this.name = 'Level';
 
-		this.mesh = mesh;
+		this.mesh = this.experience.resources.get('level').scene
 
 		this.container = container;
 		this.container.matrixAutoUpdate = true;

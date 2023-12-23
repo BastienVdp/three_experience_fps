@@ -10,6 +10,7 @@ import World from './World';
 export default class Experience
 {
 	static instance;
+
 	constructor(options)
 	{
 		if(Experience.instance) {
@@ -18,7 +19,9 @@ export default class Experience
 		Experience.instance = this;
 
 		this.canvas = options.canvas;
-		this.clock = new THREE.Clock();
+
+		this.lastFrameTime = null;
+		this.animFrameId = 0;
 
 		this.isDebugging = window.location.hash === '#debug';
 
@@ -70,13 +73,8 @@ export default class Experience
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 		directionalLight.position.set(1, 1, 1);
 		this.scene.add(directionalLight);
-
 		this.world = new World()
-
 		this.scene.add(this.world.container);
-
-		this.camera.lookAt(this.world.container.position)
-		// console.log('Experience Scene: ', this.scene);
 	}
 	
 	/*
@@ -126,14 +124,23 @@ export default class Experience
 		this.orbitControls.enableDamping = true;
 	}
 
-	update()
+	start()
 	{
-		const elapsedTime = this.clock.getElapsedTime();
+		this.animFrameId = window.requestAnimationFrame(this.update);
+	}
 
-		if(this.world) {
-			this.world.update(elapsedTime);
+	update(t)
+	{
+		if(this.lastFrameTime === null) {
+			this.lastFrameTime = t;
 		}
 
+		const delta = t - this.lastFrameTime;
+		const elapsedTime = Math.min(1.0 / 30.0, delta * 0.001);
+		
+		this.step(elapsedTime);
+		this.lastFrameTime = t;
+	
 		if(this.orbitControls) {
 			this.orbitControls.update();
 		}
@@ -141,5 +148,12 @@ export default class Experience
 		this.renderer.render(this.scene, this.camera);
 
 		window.requestAnimationFrame(this.update.bind(this));
+	}
+
+	step(elapsedTime)
+	{
+		if(this.world) {
+			this.world.update(elapsedTime);
+		}
 	}
 }

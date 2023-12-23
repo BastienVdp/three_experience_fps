@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 
-import Objects from './Objects';
-import Controls from './Controls';
-
-import Floor from './Objects/Floor';
 import Experience from '..';
+import Objects from './Objects';
+import Floor from './Objects/Floor';
 import Sky from './Objects/Sky';
+import Player from './Objects/Player';
+import Keyboard from '../Core/Keyboard';
 
 export default class World
 {
@@ -26,6 +26,7 @@ export default class World
 
 		if(this.debug) {
 			this.debugFolder = this.debug.addFolder('World');
+			this.debugFolder.open();
 		}
 
 		this.start();
@@ -36,16 +37,13 @@ export default class World
 	*/
 	start()
 	{
-		this.setControls();
+		this.setKeyboard();
 		this.setObjects();		
 	}
 
-	/*
-	*	Mise en place des contrôles
-	*/
-	setControls()
+	setKeyboard()
 	{
-		this.controls = new Controls();
+		this.keyboard = new Keyboard();
 	}
 
 	/*
@@ -53,20 +51,19 @@ export default class World
 	*/
 	setObjects()
 	{
-		this.objects = new Objects({
-			debug: this.debugFolder
-		});
+		this.objects = new Objects();
 		
 		this.objects.add("floor", new Floor({
-			sizes: {
-				width: 20,
-				height: 20
-			},
 			debug: this.debugFolder
-		}));
+		})); 
 
 		this.objects.add("sky", new Sky({
 			debug: this.debugFolder
+		}));
+
+		this.objects.add("player", new Player({
+			keyboard: this.keyboard,
+			debug: this.debugFolder,
 		}));
 		
 		this.objects.initialize();

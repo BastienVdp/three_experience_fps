@@ -10,7 +10,6 @@ export default class Sky extends Object
 		super();
 
 		this.experience = new Experience();
-		this.name = 'Sky';
 		this.debug = debug;
 
 		// Mise en place

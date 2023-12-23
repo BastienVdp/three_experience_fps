@@ -7,7 +7,7 @@ export default class Component
 
 	getParent(name)
 	{
-		return this.parent.get(name)
+		return this.parent
 	}
 
 	setParent(parent) 

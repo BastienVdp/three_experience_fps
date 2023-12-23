@@ -10,9 +10,8 @@ export default class Floor extends Object
 		super();
 
 		this.experience = new Experience();
-		this.name = 'Floor';
+
 		this.debug = debug;
-		this.sizes = sizes;
 
 		// Mise en place
 		this.container = new THREE.Object3D();
@@ -40,12 +39,4 @@ export default class Floor extends Object
 		}));
 	}	
 
-	update(elapsedTime)
-	{
-		for (const key in this.components) {
-			if (this.components.hasOwnProperty(key)) {
-				this.components[key].update();
-			}
-		}
-	}
 }

@@ -100,9 +100,11 @@ export default class Object
 
 	update(elapsedTime)
 	{
-		// console.log('update', this.name);
-		this.components.forEach(component => {
-			console.log('update', component.name);
-		})
+		for (const key in this.components) {
+			if (this.components.hasOwnProperty(key)) {
+				this.components[key].update(elapsedTime);
+			}
+		}
 	}
+	
 }
