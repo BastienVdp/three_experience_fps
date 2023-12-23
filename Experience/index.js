@@ -3,7 +3,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as dat from 'dat.gui';
 
 import Resources from './Core/Resources';
-import Time from './Core/Time';
 import Sizes from './Core/Sizes';
 
 import World from './World';
@@ -59,14 +58,6 @@ export default class Experience
 		});
 	}
 
-	/*
-	*	Setup time
-	*/
-	setTime()
-	{
-		this.time = new Time();
-	}
-
 	setSizes()
 	{
 		this.sizes = new Sizes();
@@ -87,6 +78,7 @@ export default class Experience
 		this.camera.lookAt(this.world.container.position)
 		// console.log('Experience Scene: ', this.scene);
 	}
+	
 	/*
 	*	Setup scene
 	*/
