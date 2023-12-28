@@ -1,11 +1,14 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as dat from 'dat.gui';
 
-import Resources from './Core/Resources';
-import Sizes from './Core/Sizes';
+import Resources from './Resources';
+
+import Time from './Utils/Time';
+import Sizes from './Utils/Sizes';
 
 import World from './World';
+import Camera from './Camera';
+import Renderer from './Renderer';
 
 export default class Experience
 {
@@ -18,19 +21,11 @@ export default class Experience
 		}
 		Experience.instance = this;
 
-		this.canvas = options.canvas;
-
-		this.lastFrameTime = null;
-		this.animFrameId = 0;
-
-		this.isDebugging = window.location.hash === '#debug';
-
-		if(this.isDebugging) {
+		if(window.location.hash === '#debug') {
 			this.debug = new dat.GUI({ width: 420 });
 		}
 
-		this.setResouces();
-		this.setSizes();
+		this.canvas = options.canvas;
 
 		this.init();
 
@@ -40,10 +35,14 @@ export default class Experience
 
 	init()
 	{		
+		this.setSizes();
+		this.setTime();
+		this.setResouces();
+
 		this.setScene();
 		this.setCamera();
 		this.setRenderer();	
-		this.setOrbitControls();
+		this.setWorld();
 	}
 
 	/*
@@ -56,25 +55,25 @@ export default class Experience
 		this.resources.on('progress', (progress) => {
 			console.log('Progression:', progress);
 		});
-		this.resources.on('ready', () => {
-			this.setWorld();
-		});
 	}
 
 	setSizes()
 	{
 		this.sizes = new Sizes();
+
+		this.sizes.on("resize", () => {	
+			this.resize();
+		});
+	}
+
+	setTime()
+	{
+		this.time = new Time();
 	}
 
 	setWorld()
 	{
-		const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-		this.scene.add(ambientLight);	
-		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-		directionalLight.position.set(1, 1, 1);
-		this.scene.add(directionalLight);
 		this.world = new World()
-		this.scene.add(this.world.container);
 	}
 	
 	/*
@@ -90,70 +89,45 @@ export default class Experience
 	*/
 	setCamera()
 	{
-		this.camera = new THREE.PerspectiveCamera(60, this.sizes.width / this.sizes.height, 1, 1000);
-		// this.camera.up.set(0, 1, 0)
-		this.camera.position.set(0, 20, 20)
-		
-		this.sizes.on('resize', () => {
-			this.camera.aspect = this.sizes.width / this.sizes.height;
-			this.camera.updateProjectionMatrix();
-		});
+		this.camera = new Camera();
 	}
 
+	setNewCamera(camera)
+	{
+		this.camera = camera;
+	}
 	/*
 	*	Setup renderer
 	*/
 	setRenderer()
 	{
-		this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true});
-		this.renderer.toneMapping = THREE.ReinhardToneMapping;
-		this.renderer.toneMappingExposure = 2.3;
-		this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-		this.renderer.setSize(this.sizes.width, this.sizes.height);
-
-		this.sizes.on('resize', () => {
-            this.renderer.setSize(this.sizes.width, this.sizes.height);
-        });
+		this.renderer = new Renderer();
 	}
 
-	setOrbitControls()
+	resize()
 	{
-		this.orbitControls = new OrbitControls(this.camera, this.canvas);
-		this.orbitControls.enableDamping = true;
+		this.camera.resize();
+		this.renderer.resize();
 	}
 
-	start()
+	update()
 	{
-		this.animFrameId = window.requestAnimationFrame(this.update);
-	}
-
-	update(t)
-	{
-		if(this.lastFrameTime === null) {
-			this.lastFrameTime = t;
+		if(this.time) {
+			this.time.update();
 		}
-
-		const delta = t - this.lastFrameTime;
-		const elapsedTime = Math.min(1.0 / 30.0, delta * 0.001);
 		
-		this.step(elapsedTime);
-		this.lastFrameTime = t;
-	
-		if(this.orbitControls) {
-			this.orbitControls.update();
+		if(this.camera) {
+			this.camera.update();
+		}
+		
+		if(this.world) {
+			this.world.update();
 		}
 
-		this.renderer.render(this.scene, this.camera);
+		if(this.renderer) {
+			this.renderer.update();
+		}
 
 		window.requestAnimationFrame(this.update.bind(this));
-	}
-
-	step(elapsedTime)
-	{
-		if(this.world) {
-			this.world.update(elapsedTime);
-		}
 	}
 }
