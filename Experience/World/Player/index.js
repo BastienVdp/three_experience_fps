@@ -19,6 +19,8 @@ export default class Player
 		this.resources = this.experience.resources;
 		this.sizes = this.experience.sizes;
 
+        this.container = new THREE.Object3D();
+
 		// Debug
 		if(this.experience.debug) {
 			this.debugFolder = this.experience.debug.addFolder('Player');
@@ -55,15 +57,17 @@ export default class Player
             0.35  // Rayon de la capsule
         );
 
-		this.setAvatar();
 		this.initControls();
         this.initCamera();
+		this.setAvatar();
 	}
 
 	setAvatar()
 	{
 		this.avatar = new Avatar({ 
-            player: this.player 
+            player: this.player,
+            camera: this.fpsCamera,
+            container: this.container,
         });
 	}
 

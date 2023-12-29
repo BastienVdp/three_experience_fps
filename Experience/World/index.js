@@ -38,6 +38,7 @@ export default class World
 		this.shipment = new Shipment();
 		this.environment = new Environment();
 		this.player = new Player();
+		this.scene.add(this.player.container);
 		this.scene.add(new THREE.AxesHelper(5));
 	}
 	

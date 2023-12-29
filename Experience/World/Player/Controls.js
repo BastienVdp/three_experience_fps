@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import Experience from "../..";
 
 export default class Controls

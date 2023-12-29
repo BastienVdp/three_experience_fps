@@ -17,8 +17,11 @@ export default class FirstPersonCamera
 		this.xAxis = new THREE.Vector3(1.0, 0.0, 0.0);
         this.yAxis = new THREE.Vector3(0.0, 1.0, 0.0);
 
+		this.quaternion = new THREE.Quaternion();
+
 		this.mouseSpeed = 0.002;
         this.isLocked = false;
+		this.cumulativeYaw = 0;
 
 		this.initialize();
 
@@ -58,19 +61,23 @@ export default class FirstPersonCamera
         this.angles.y -= (movementX * this.mouseSpeed);
 		this.angles.x -= (movementY * this.mouseSpeed);
 
-        this.angles.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.angles.x));
+		this.cumulativeYaw += event.movementX * this.mouseSpeed;
 
-        // this.updateRotation();
+		// Limiter l'angle vertical entre -90 et 90 degrés
+        this.angles.x = Math.max(-Math.PI / 8, Math.min(Math.PI / 8, this.angles.x));
+
+		// console.log(this.angles);
+        this.updateRotation();
     }
 
 	updateRotation()
 	{
-		this.pitch.setFromAxisAngle(this.xAxis, this.angles.x);
-        this.yaw.setFromAxisAngle(this.yAxis, this.angles.y);
+		this.yaw.setFromAxisAngle(this.xAxis, this.angles.x);
+        this.pitch.setFromAxisAngle(this.yAxis, this.angles.y);
 
-		this.player.rotation.multiplyQuaternions(this.yaw, this.pitch);
+		this.quaternion.multiplyQuaternions(this.pitch, this.yaw);
 
-		// this.player.camera.quaternion.copy(this.player.rotation);
+		this.player.camera.quaternion.copy(this.quaternion);
 	}
 
 	updateCamera()
@@ -85,6 +92,9 @@ export default class FirstPersonCamera
 		// Adjust the camera's height
 		this.player.camera.position.y += (this.player.height / 1) + 0.1;
 		// Copy only the player's rotation without affecting the camera's rotation
+
+		let horizontalRotation = new THREE.Euler(0, this.angles.y, 0, 'YXZ');
+		this.player.rotation.setFromEuler(horizontalRotation);
 	}
 
 	update()

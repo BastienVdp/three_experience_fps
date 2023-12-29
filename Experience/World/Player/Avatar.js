@@ -2,13 +2,15 @@ import * as THREE from "three";
 import Experience from "../..";
 
 export default class Avatar {
-	constructor({ player })
+	constructor({ player, camera, container })
 	{
 		this.experience = new Experience();
 		this.scene = this.experience.scene;
 		this.resources = this.experience.resources;
 		this.avatar = this.resources.get('arms').scene;
 		this.player = player;
+		this.camera = camera;
+		this.container = container;
 		
 		this.initialize();
 	}
@@ -16,20 +18,27 @@ export default class Avatar {
 	initialize()
 	{
 		this.avatar.scale.set(5, 5, 5);
-		this.avatar.quaternion.copy(this.player.rotation);
-		this.avatar.axesHelper = new THREE.AxesHelper(5); 
+		this.avatar.rotateY(Math.PI);
+		this.avatar.axesHelper = new THREE.AxesHelper(15); 
 		this.avatar.add(this.avatar.axesHelper);
-		this.scene.add(this.avatar);
-
+		this.container.add(this.avatar);
+		this.avatar.updateMatrixWorld(true);
 		this.createDebug();
 	}
 
 	updatePosition() {
         this.avatar.position.copy(this.player.collider.end);
-        this.avatar.position.y += this.player.height - 2.5;
+        this.avatar.position.y += this.player.height - 2.5
+		// this.avatar.position.x += 0.1;
         this.capsuleWireframe.position.copy(this.player.collider.end);
         
-        this.avatar.quaternion.copy(this.player.rotation);
+		this.avatar.rotation.y = this.camera.cumulativeYaw;
+		// Conversion de la rotation de la caméra (quaternion) en Euler
+
+		// Utilisation de la valeur de pitch limitée de la caméra
+    	// this.avatar.rotation.x = this.camera.angles.x
+		console.log(this.camera.angles);
+		this.avatar.rotation.x = Math.PI - this.camera.angles.x;
     }
 
 	createDebug()
