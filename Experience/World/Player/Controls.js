@@ -23,6 +23,7 @@ export default class Controls
         this.player.onFloor = false;
 
         if (result) {
+            
             this.player.onFloor = result.normal.y > 0;
 
             this.player.collider.translate(
@@ -110,15 +111,16 @@ export default class Controls
         this.playerCollisions();
         
 
-        if(this.player.camera.position.y < -20) {
+        if(this.player.position.y < -20) {
+        
             this.outOfBounds();
         }
 	}
 
     outOfBounds()
     {
-        const spawnPos = new THREE.Vector3(-22.4437, 8 + 5, -15.0529);
-        this.player.velocity = this.player.spawn.velocity;
+        const spawnPos = new THREE.Vector3(0, 0, 0);
+        this.player.velocity = new THREE.Vector3();
 
         this.player.collider.start.copy(spawnPos);
         this.player.collider.end.copy(spawnPos);

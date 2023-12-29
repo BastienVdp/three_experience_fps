@@ -36,6 +36,8 @@ export default class Camera
 	{
 		this.perspectiveCamera = new THREE.PerspectiveCamera(this.settings.fov, this.settings.aspect, this.settings.near, this.settings.far);
 		this.perspectiveCamera.position.set(0, 20, -20);
+		this.perspectiveCamera.name = 'DefaultCamera';
+		
 		this.scene.add(this.perspectiveCamera);
 	}
 	

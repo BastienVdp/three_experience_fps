@@ -3,16 +3,25 @@ import Experience from '../..';
 
 export default class FirstPersonCamera
 {
-	constructor({ player, avatar })
+	constructor({ player, avatar, playerContainer })
 	{
 		this.experience = new Experience();
+		this.renderer = this.experience.renderer;
 		this.time = this.experience.time;
 		this.avatar = avatar;
 		this.player = player;
+		this.playerContainer = playerContainer;
 
+		this.container = new THREE.Object3D();
+		this.container.name = 'PlayerCameraContainer';
+		this.playerContainer.add(this.container);
+
+		
+		// Setup
 		this.angles = new THREE.Euler();
-		this.pitch = new THREE.Quaternion();
-		this.yaw = new THREE.Quaternion();
+		
+		this.horizontalRotation = new THREE.Quaternion();
+        this.verticalRotation = new THREE.Quaternion();
 
 		this.xAxis = new THREE.Vector3(1.0, 0.0, 0.0);
         this.yAxis = new THREE.Vector3(0.0, 1.0, 0.0);
@@ -38,7 +47,8 @@ export default class FirstPersonCamera
 
 	initialize()
 	{
-		this.angles.setFromQuaternion(this.player.rotation);
+		this.container.add(this.player.camera);
+		this.renderer.setCameraToRenderer(this.player.camera);
 	}
 
 	onPointerlockChange = () => {
@@ -57,44 +67,41 @@ export default class FirstPersonCamera
     
         const { movementX, movementY } = event
 
-    
         this.angles.y -= (movementX * this.mouseSpeed);
 		this.angles.x -= (movementY * this.mouseSpeed);
 
-		this.cumulativeYaw += event.movementX * this.mouseSpeed;
+		// Rotation horizontale totale 
+		this.cumulativeYaw -= event.movementX * this.mouseSpeed;
 
-		// Limiter l'angle vertical entre -90 et 90 degrés
-        this.angles.x = Math.max(-Math.PI / 8, Math.min(Math.PI / 8, this.angles.x));
+		// Limiter l'angle vertical entre -15 et 15 degrés
+        this.angles.x = Math.max(-Math.PI / 12, Math.min(Math.PI / 12, this.angles.x));
 
-		// console.log(this.angles);
         this.updateRotation();
     }
 
 	updateRotation()
 	{
-		this.yaw.setFromAxisAngle(this.xAxis, this.angles.x);
-        this.pitch.setFromAxisAngle(this.yAxis, this.angles.y);
+		// Gestion de la rotation horizontale (yaw)
+		this.horizontalRotation.setFromAxisAngle(this.yAxis, this.angles.y);
 
-		this.quaternion.multiplyQuaternions(this.pitch, this.yaw);
+		// Gestion de la rotation verticale (pitch)
+		this.verticalRotation.setFromAxisAngle(this.xAxis, this.angles.x);
 
-		this.player.camera.quaternion.copy(this.quaternion);
+		// Multiplier les deux rotations pour obtenir la rotation finale
+		this.quaternion.multiplyQuaternions(this.horizontalRotation, this.verticalRotation);
+
+		// Appliquer la rotation au container de la caméra
+		this.container.quaternion.copy(this.quaternion);
 	}
 
 	updateCamera()
 	{
-		// Set the camera position based on the player's collider end position
-		this.player.camera.position.set(
-			this.player.collider.end.x,
-			this.player.collider.end.y,
-			this.player.collider.end.z
-		);
-	
-		// Adjust the camera's height
-		this.player.camera.position.y += (this.player.height / 1) + 0.1;
-		// Copy only the player's rotation without affecting the camera's rotation
+		// Positionner le container de la caméra à la position du haut de la capsule
+		this.container.position.copy(this.player.collider.end);
+		// Positionner le container de la caméra vers le haut
+		this.container.position.y += (this.player.height / 1) + 0.1;
 
-		let horizontalRotation = new THREE.Euler(0, this.angles.y, 0, 'YXZ');
-		this.player.rotation.setFromEuler(horizontalRotation);
+		this.player.position = this.container.position;
 	}
 
 	update()

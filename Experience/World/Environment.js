@@ -11,6 +11,8 @@ export default class Environment
 		this.resources = this.experience.resources;
 		this.debug = this.experience.world.debugFolder;
 
+		this.container = new THREE.Object3D();
+		this.container.name = 'EnvironmentContainer';
 		
 		if(this.debug) {
 			this.debugFolder = this.debug.addFolder('Environment');
@@ -30,12 +32,12 @@ export default class Environment
         this.scene.background = this.environmentMap.texture;
 
         const light = new THREE.AmbientLight(0x404040, 5); // soft white light
-        this.scene.add(light);
+        this.container.add(light);
 
         this.sunLight = new THREE.DirectionalLight("#ffffff", 3);
 
         this.sunLight.position.set(1.5, 7, -3);
-        this.scene.add(this.sunLight);
+        this.container.add(this.sunLight);
 
 		// Debug
 		if(this.debug) {

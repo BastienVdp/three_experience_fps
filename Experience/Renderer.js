@@ -10,8 +10,9 @@ export default class Renderer
 		this.debug = this.experience.debug;
 		this.sizes = this.experience.sizes;
 		this.scene = this.experience.scene;
-		this.camera = this.experience.camera;
 		this.canvas = this.experience.canvas;
+
+		this.camera = this.experience.camera.perspectiveCamera;
 
 		if(this.debug) {
 			this.debugFolder = this.debug.addFolder('Renderer');
@@ -39,6 +40,12 @@ export default class Renderer
 		}
 	}
 
+	setCameraToRenderer(camera)
+	{
+		this.camera = camera;
+		// this.renderer.setClearColor(this.camera.perspectiveCamera.background);
+	}
+
 	resize()
 	{
 		this.renderer.setSize(this.sizes.width, this.sizes.height);
@@ -47,6 +54,6 @@ export default class Renderer
 
 	update()
 	{
-		this.renderer.render(this.scene, this.camera.perspectiveCamera);
+		this.renderer.render(this.scene, this.camera);
 	}
 }

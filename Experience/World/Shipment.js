@@ -14,6 +14,10 @@ export default class Shipment
 		this.resources = this.experience.resources;
 		this.debug = this.experience.world.debugFolder;
 
+
+		this.container = new THREE.Object3D();
+		this.container.name = 'ShipmentContainer';
+
 		// Debug
 		if(this.debug) {
 			this.debugFolder = this.debug.addFolder('Shipment');
@@ -32,6 +36,7 @@ export default class Shipment
 	initiliaze()
 	{
 		this.shipment = this.resources.get('shipment').scene.children[0];
+		// console.log(this.shipment);
 		this.bricks = this.shipment.getObjectByName('bricks');
 		this.cars = this.shipment.getObjectByName('cars');
 		this.cones = this.shipment.getObjectByName('cones');
@@ -39,21 +44,16 @@ export default class Shipment
 		this.plants = this.shipment.getObjectByName('plants');
 		this.outside = this.shipment.getObjectByName('outside');
 		this.floor = this.shipment.getObjectByName('floor');
-		this.scene.add(this.shipment);
+		this.blueContainers = this.shipment.getObjectByName('containers_blue');
+		this.redContainers = this.shipment.getObjectByName('containers_red');
+		this.container.add(this.shipment);
 		// this.shipment.position.y = -5;
-		const floorGeometry = new THREE.WireframeGeometry(this.floor.geometry);
+		
+		// this.octree.fromGraphNode(this.blueContainers);
+		this.octree.fromGraphNode(this.redContainers);
 
-		// Créez un matériau pour la géométrie en fil de fer
-		const floorMaterial = new THREE.MeshBasicMaterial({
-			color: 0x000000,	
-		})
-		
-		// Créez une ligne en fil de fer à partir de la géométrie et du matériau
-		const floorWireframe = new THREE.LineSegments(floorGeometry, floorMaterial);
-		
-		// Ajoutez la ligne en fil de fer à votre scène
-		// this.shipment.scale.set(0.1, 0.1, 0.1);
-		this.scene.add(floorWireframe);
 		this.octree.fromGraphNode(this.floor);
+		this.octree.fromGraphNode(this.walls);
+
 	}
 }

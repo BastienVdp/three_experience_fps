@@ -74,6 +74,7 @@ export default class Experience
 	setWorld()
 	{
 		this.world = new World()
+		this.scene.add(this.world.container);
 	}
 	
 	/*

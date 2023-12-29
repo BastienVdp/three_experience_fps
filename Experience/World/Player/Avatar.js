@@ -2,43 +2,47 @@ import * as THREE from "three";
 import Experience from "../..";
 
 export default class Avatar {
-	constructor({ player, camera, container })
+	constructor({ player, camera, playerContainer })
 	{
 		this.experience = new Experience();
 		this.scene = this.experience.scene;
 		this.resources = this.experience.resources;
-		this.avatar = this.resources.get('arms').scene;
+		this.avatar = this.resources.get('rifle');
+		// console.log(this.avatar);
+
 		this.player = player;
 		this.camera = camera;
-		this.container = container;
+		this.playerContainer = playerContainer;
+
+		this.container = new THREE.Object3D();
+		this.container.name = 'AvatarContainer';
+		this.playerContainer.add(this.container);
 		
 		this.initialize();
 	}
 
 	initialize()
 	{
-		this.avatar.scale.set(5, 5, 5);
+		this.avatar.scale.set(.2, .2, .2);
 		this.avatar.rotateY(Math.PI);
 		this.avatar.axesHelper = new THREE.AxesHelper(15); 
 		this.avatar.add(this.avatar.axesHelper);
 		this.container.add(this.avatar);
-		this.avatar.updateMatrixWorld(true);
+
 		this.createDebug();
 	}
 
-	updatePosition() {
-        this.avatar.position.copy(this.player.collider.end);
-        this.avatar.position.y += this.player.height - 2.5
-		// this.avatar.position.x += 0.1;
-        this.capsuleWireframe.position.copy(this.player.collider.end);
-        
-		this.avatar.rotation.y = this.camera.cumulativeYaw;
-		// Conversion de la rotation de la caméra (quaternion) en Euler
+	updatePosition() 
+	{
+		// Copier la position du container de l'avatar
+        this.container.position.copy(this.player.collider.end);
+        this.container.position.y += this.player.height - 3
 
-		// Utilisation de la valeur de pitch limitée de la caméra
-    	// this.avatar.rotation.x = this.camera.angles.x
-		console.log(this.camera.angles);
-		this.avatar.rotation.x = Math.PI - this.camera.angles.x;
+		// Rotation du container de l'avatar par rapport a la rotation horizontal de la caméra
+		this.container.rotation.y = this.camera.cumulativeYaw;
+
+		// Rotation des bras par rapport a la rotation vertical de la caméra
+		this.avatar.rotation.x = Math.PI + this.camera.verticalRotation.x;
     }
 
 	createDebug()
@@ -71,7 +75,7 @@ export default class Avatar {
         // Ajoutez la ligne en fil de fer à votre scène
         this.capsuleWireframe.position.copy(this.player.collider.start);
 
-        this.scene.add(this.capsuleWireframe);
+        this.container.add(this.capsuleWireframe);
 	}
 
 	update()

@@ -20,6 +20,7 @@ export default class Player
 		this.sizes = this.experience.sizes;
 
         this.container = new THREE.Object3D();
+        this.container.name = 'PlayerContainer';
 
 		// Debug
 		if(this.experience.debug) {
@@ -34,7 +35,7 @@ export default class Player
 	{
 		this.player = {};
 
-        this.player.camera = this.camera.perspectiveCamera;
+        this.player.camera = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 1000);
         this.player.animation = "idle";
 
         this.jumpOnce = false;
@@ -42,9 +43,9 @@ export default class Player
         this.player.gravity = 60;
 
         this.player.height = 10;
-        this.player.speedMultiplier = 2.8;
-        this.player.rotation= new THREE.Quaternion();
-
+        this.player.speedMultiplier = 4.2;
+        this.player.position = new THREE.Vector3(0, 0, 0);
+        
         this.upVector = new THREE.Vector3(0, 1, 0);
         this.player.velocity = new THREE.Vector3();
         this.player.direction = new THREE.Vector3();
@@ -67,7 +68,7 @@ export default class Player
 		this.avatar = new Avatar({ 
             player: this.player,
             camera: this.fpsCamera,
-            container: this.container,
+            playerContainer: this.container,
         });
 	}
 
@@ -84,6 +85,7 @@ export default class Player
             player: this.player,
             avatar: this.avatar,
             controls: this.controls,
+            playerContainer: this.container,
         });
     }	
 

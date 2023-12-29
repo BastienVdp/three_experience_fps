@@ -15,6 +15,9 @@ export default class World
 		this.resources = this.experience.resources;
 		this.debug = this.experience.debug;
 
+		this.container = new THREE.Object3D();
+		this.container.name = 'WorldContainer';
+
 		this.octree = new Octree();
 
 
@@ -27,6 +30,7 @@ export default class World
 		// World is ready
 		this.resources.on('ready', () => {
 			this.start();
+			console.log(this.scene);
 		});
 	}
 
@@ -36,10 +40,13 @@ export default class World
 	start()
 	{
 		this.shipment = new Shipment();
+		this.container.add(this.shipment.container);
+
 		this.environment = new Environment();
+		this.container.add(this.environment.container);
+
 		this.player = new Player();
-		this.scene.add(this.player.container);
-		this.scene.add(new THREE.AxesHelper(5));
+		this.container.add(this.player.container);
 	}
 	
 
